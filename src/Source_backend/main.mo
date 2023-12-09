@@ -8,9 +8,10 @@ import Nat32 "mo:base/Nat32";
 import Types "Types";
 
 shared ({ caller }) actor class QuoteActor(_priceFeedID : Text, solvencyFacor : Nat, _ckBTCPrincipal : Text, _quoteID : Text, _stathID : Text) = this {
-  type Aggregator = Types.Aggregator;
+
   type PriceFeed = Types.XRC;
   type Subaccount = Types.Subaccount;
+  type ICRC = Types.ICRC;
   type Result<Err, Ok> = Result.Result<Text, Text>;
   type Price = {
     price : Nat;
@@ -45,10 +46,9 @@ shared ({ caller }) actor class QuoteActor(_priceFeedID : Text, solvencyFacor : 
   stable let ckBTC_ID = _ckBTCPrincipal; //canisterID for ckBTc
   stable let quote_ID = _quoteID; //canisterID for deployed $QUOTE canisterID
   stable let stath_ID = _stathID; //canisterID for deployed $STATH canisterID
-  stable let quote : Types.ICRC = actor (quote_ID);
-  stable let stath : Types.ICRC = actor (stath_ID); //initailising tokens using the icrc token interface
-  stable let ckBTC : Types.ICRC = actor (ckBTC_ID);
-  stable let btcPriceAggregator : Aggregator = actor ("aaaaa-aa"); //Note :"aaaaa-aa" is just used as a proxy
+  stable let quote : ICRC = actor (quote_ID);
+  stable let stath : ICRC = actor (stath_ID); //initailising tokens using the icrc token interface
+  stable let ckBTC : ICRC = actor (ckBTC_ID);
   stable let oracle : PriceFeed = actor (priceFeedID);
 
   // incentiveFactor is a measure of the rewards in $STATH used to incentives the burning of quote when solvencyFactor has been subceeded
@@ -60,7 +60,7 @@ shared ({ caller }) actor class QuoteActor(_priceFeedID : Text, solvencyFacor : 
   //sendIn and sendOut functions used for transferring tokens in and out of the pool
   //Note:SendIn functions for $QUOTE and $STATH results in burning the  sent tokens and sendOut in minting
   //this is due to that fact that this canister ID is set as the minting account for both tokens
-
+  //isTransfer is set as true  only for ckBTC transactions
   private func _sendIn(tokenID : Text, isTransfer : Bool, from : Principal, _subaccount : ?Subaccount, amount : Nat) : async () {
     let token : Types.ICRC = actor (tokenID);
     let actorAddress = Principal.fromText("");

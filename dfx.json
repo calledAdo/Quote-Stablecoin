@@ -3,25 +3,12 @@
     "Source_backend": {
       "main": "src/Source_backend/main.mo",
       "type": "motoko"
-    },
-    "Source_frontend": {
-      "dependencies": [
-        "Source_backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/Source_frontend/src/index.html"
-      },
-      "source": [
-        "src/Source_frontend/assets",
-        "dist/Source_frontend/"
-      ],
-      "type": "assets"
     }
   },
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",
