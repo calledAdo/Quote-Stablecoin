@@ -5,6 +5,7 @@ import Text "mo:base/Text";
 import Result "mo:base/Result";
 import Nat64 "mo:base/Nat64";
 import Nat32 "mo:base/Nat32";
+
 import Types "Types";
 import ICRC1 "ICRC1";
 
@@ -227,7 +228,7 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
       btc_price = result.price;
       price_decimal = result.price_decimal;
       pool_balance = pool_balance;
-      pool_valuation = (pool_balance * price) / price_decimal;
+      pool_valuation = (pool_balance * price) / 10 ** price_decimal;
       quote_total_supply = await quote.icrc1_total_supply();
       stath_total_supply = await stath.icrc1_total_supply();
     });
