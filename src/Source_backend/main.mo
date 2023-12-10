@@ -8,7 +8,7 @@ import Nat32 "mo:base/Nat32";
 import Types "Types";
 import ICRC1 "ICRC1";
 
-shared ({ caller }) actor class QuoteActor(_priceFeedID : Text, solvencyFacor : Nat, _ckBTCPrincipal : Text) = this {
+shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_factor : Nat, _ckBTC_principal_id : Text) = this {
 
   type PriceFeed = Types.XRC;
   type Subaccount = Types.Subaccount;
@@ -49,8 +49,8 @@ shared ({ caller }) actor class QuoteActor(_priceFeedID : Text, solvencyFacor : 
   stable var stath : ICRC = actor (stath_ID);
 
   //canisterID for ckBTc
-  stable let priceFeedID = _priceFeedID; //canisterID for xrc deployed on mainnet
-  stable let ckBTC_ID = _ckBTCPrincipal; //initailising tokens using the icrc token interface
+  stable let priceFeedID = _price_feed_id; //canisterID for xrc deployed on mainnet
+  stable let ckBTC_ID = _ckBTC_principal_id; //initailising tokens using the icrc token interface
   stable let ckBTC : ICRC = actor (ckBTC_ID);
   stable let oracle : PriceFeed = actor (priceFeedID);
 
