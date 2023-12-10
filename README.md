@@ -1,10 +1,10 @@
 # Quote Stablecoin
 
-Quote stablecoin (symbol $QUOTE) is the first decentralized algorithmic stablecoin on the Internet Computer Network that is backed by Chain Key Bitcoin (ckBTC) which is a secure form of bitcoin on the Internet Computer network that can be retrieved in a ratio of 1:1 on thhe bitcoin network by utilising the threshold ECDSA.<br>
+Quote stablecoin (symbol $QUOTE) is the first decentralized algorithmic stablecoin on the Internet Computer Network that is backed by Chain Key Bitcoin (ckBTC) which is a secure form of bitcoin on the Internet Computer network that can be retrieved in a ratio of 1:1 on the bitcoin network by utilising the threshold ECDSA.<br>
 
 ## Quote Token Mechanism
 
-The  $QUOTE token is an ICRC token that is minted by depositing any amount of ckBTC (no minimum amount set for now) into the QuoteMinter Canister and the price equivalent of that amount in $USD is minted an sent to the depositor <br><br>
+The  $QUOTE token is an ICRC token that is minted by depositing any amount of ckBTC (no minimum amount set for now) into the QuoteMinter Canister and the price equivalent of that amount in $USD is minted and sent to the depositor <br><br>
 
 Cryptocurrencies are currently very volatile hence if the deposited amount of ckBTC loses its value due to price drop the minted tokens become devalued and hence no longer pegged to a dollar ,this risk is commonly averted by requiring users to deposit a greater value of the volatile asset for a lesser value of token.
 
@@ -13,22 +13,24 @@ Cryptocurrencies are currently very volatile hence if the deposited amount of ck
 QuoteMinter Canister uses a unique approach whereby other users (holders of $STATH) provide this excess liquidity needed as Overcollateral for the minted tokens .<br>
 
 
-$STATH is minted by calling the mintSTATH method in the QuoteMinter Canister which initaites a deposit of a specified amount of ckBTC into the QuoteMinter Canister and then the equivalent amount of $STATH is minted ,
->this means the value of $STATH at any point in time is determined by the total amount of ckBTC within the QuoteMinter Canister minus the amount just equivalent in USD to the entire supply of $QUOTE token<br>
+$STATH is minted by calling the mintSTATH method in the QuoteMinter Canister which initiates a deposit of a specified amount of ckBTC into the QuoteMinter Canister and then the equivalent amount of $STATH is minted ,
+>The value of $STATH at any point in time is determined by the total amount of ckBTC within the QuoteMinter Canister minus the amount just equivalent in USD to the entire supply of $QUOTE token<br>
 
-**$STATH** holders are incentivized by the fees collected during minting and burning of $QUOTE and also since $QUOTE is an __ICRC__ token ,the fees are burnt hence reducing the total supply of the token on every transactions which would also be to the advantage of $STATH holders .
+**$STATH** holders are incentivized by the fees collected during minting and burning of $QUOTE and also since $QUOTE is an __ICRC__ token ,the fees for all transactions are burnt hence reducing the total supply of the token on every transaction which would also be to the advantage of $STATH holders .
 
 
 ## Features of Quote Stablecoin
 
 * ### Collateral Range <br>
-   when the equivalent amount of price of BTC falls such that the value of the total ckBTC in the QuoteMinter Canister in USD is less than 4x the total supply of $QUOTE ,minting of Quote is halted <br>
+   when the equivalent amount of price of BTC falls such that the value of the total ckBTC in the QuoteMinter Canister in USD is less than 4x the total supply of $QUOTE ,the following occurs
+  * minting of Quote is halted 
+  * Burning of Quote is halted
   
   >This is done to ensure that each minted quote token is sufficiently collateralized <br>
 
   When the price of BTC rises or total supply of $QUOTE reduces such that the value in USD of the total ckBTC in the pool is greater than 8x the total supply of $QUOTE,the minting of STATH is halted<br>
 
-  >This is done to avoid over saturation of rewards for $STATH holders and hence further incentivizing users to hold $STATH <br>
+  >This is done to avoid over-saturation of rewards for $STATH holders and hence further incentivizing users to hold $STATH long term<br>
 
 
 * ### Solvency Factor and Solvency Threshold<br>
@@ -38,14 +40,14 @@ $STATH is minted by calling the mintSTATH method in the QuoteMinter Canister whi
    >The __Solvency  Threshold__ is equal to __Solvency Factor__ percentage of QUOTE total supply e.g a if total supply is 200 and solvency factor 150(* 10**18... decimal precison) the solvency threshold would be 300.
    <br>
 * ### Incentivization Factor<br>
-  The __Incentivization Factor__ is the measure of the amount of reward in $STATH to be given for burning a certain amount of $QUOTE token when the __Solvency Threshold__ has been exceeded,this value is determined by few factor such as 
+  The __Incentivization Factor__ is the measure of the amount of reward in $STATH to be given for burning a certain amount of $QUOTE token when the __Solvency Threshold__ has been subceeded,this value is determined by few factors such as 
   * The difference of the Solvency Threshold value and the value of the entire ckBTC in the pool.
   * The amount of $QUOTE token being burnt in the call
   >This creates a demand for $QUOTE in the presence of a falling BTC price and users would be incentivized to burn $QUOTE to receive the equal amount of ckBTC and be rewarded with $STATH.<br>
   >This incentivization factor is currently set manually but can be automated <br>
 
 * ### Use of the Official Exchange Rate  Canister (XRC) <br>
-  The QuoteMinter Canister utilizes the **[Exchange Rate Canister](https://internetcomputer.org/docs/current/developer-docs/integrations/exchange-rate/exchange-rate-canister)** created by **DFINITY** which provides Real-Time Exchange rate data for different assets pair through the HTTP outcalls  to fetch the accurate Price of BTC/USD pair that would be utilised for different operations. This is currently deployed on the [uzr34 system subnet](https://dashboard.internetcomputer.org/subnet/uzr34-akd3s-xrdag-3ql62-ocgoh-ld2ao-tamcv-54e7j-krwgb-2gm4z-oqe) and has a canister ID __uf6dk-hyaaa-aaaaq-qaaaq-cai__ <br>
+  The QuoteMinter Canister utilizes the **[Exchange Rate Canister](https://internetcomputer.org/docs/current/developer-docs/integrations/exchange-rate/exchange-rate-canister)** created by **DFINITY** which provides Real-Time Exchange rate data for different assets pair through the HTTP outcalls  to fetch the accurate rate for the BTC/USD pair that would be utilised for different operations. This is currently deployed on the [uzr34 system subnet](https://dashboard.internetcomputer.org/subnet/uzr34-akd3s-xrdag-3ql62-ocgoh-ld2ao-tamcv-54e7j-krwgb-2gm4z-oqe) and has a canister ID __uf6dk-hyaaa-aaaaq-qaaaq-cai__ <br>
 
 
 ## Running the project locally
@@ -123,6 +125,7 @@ Copy the canister ID when done
  dfx canister call Backend_Source mintQUOTE '(null;10000)'
 
   ```
+
 
   
 
