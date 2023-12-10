@@ -3,6 +3,14 @@
     "Source_backend": {
       "main": "src/Source_backend/main.mo",
       "type": "motoko"
+    },
+    "Oracle": {
+      "main": "src/Source_backend/Oracle.mo",
+      "type": "motoko"
+    },
+    "ICRC": {
+      "main": "src/Source_backend/ICRC.mo",
+      "type": "motoko"
     }
   },
   "defaults": {
