@@ -7,9 +7,9 @@ import Nat64 "mo:base/Nat64";
 import Nat32 "mo:base/Nat32";
 
 import Types "Types";
-import ICRC1 "ICRC1";
+import ICRC "ICRC";
 
-shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_factor : Nat, _ckBTC_principal_id : Text) = this {
+shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _price_feed_id : Text, _solvency_factor : Nat, _ckBTC_principal_id : Text) = this {
 
   type PriceFeed = Types.XRC;
   type Subaccount = Types.Subaccount;
@@ -44,10 +44,10 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
   stable var bootStrapPhase = true;
   stable var admin = caller;
 
-  stable var quote_ID = ""; //canisterID for deployed $QUOTE canisterID
-  stable var stath_ID = ""; //canisterID for deployed $STATH canisterID
-  stable var quote : ICRC = actor (quote_ID);
-  stable var stath : ICRC = actor (stath_ID);
+  stable var quote_ID = _quoteID; //canisterID for deployed $QUOTE canisterID
+  stable var stath_ID = _stathID; //canisterID for deployed $STATH canisterID
+  stable var quote : ICRC = actor (_quoteID);
+  stable var stath : ICRC = actor (_stathID);
 
   //canisterID for ckBTc
   stable let priceFeedID = _price_feed_id; //canisterID for xrc deployed on mainnet
@@ -58,7 +58,7 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
   public func init() : async () {
     assert (deployed == false);
 
-    stath := await ICRC1.Token({
+    stath := await ICRC.Token({
       initial_mints = [{
         account = {
           owner = caller;
@@ -78,7 +78,7 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
 
     stath_ID := Principal.toText(Principal.fromActor(stath));
 
-    quote := await ICRC1.Token({
+    quote := await ICRC.Token({
       initial_mints = [{
         account = {
           owner = caller;
@@ -249,14 +249,14 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
       return await _bootStrapMint(caller, _subaccount, amount);
     };
     let amount_to_mint : Nat = amount * details.stath_total_supply / (details.pool_balance - quote_valuation);
-    let amountValue = amount_to_mint * details.btc_price / 10 ** details.price_decimal;
+    let amount_value = amount_to_mint * details.btc_price / 10 ** details.price_decimal;
 
     //Pool cannot exceed the maximum amount of leverage which is 8x
-    if ((details.quote_total_supply * 8) < (details.pool_valuation + amountValue)) {
+    if ((details.quote_total_supply * 8) < (details.pool_valuation + amount_value)) {
       return #err("Exceeded Collateral Maximum");
     };
     let sendInTx = await _sendIn(ckBTC_ID, true, caller, _subaccount, amount);
-    let mintTx = await _sendOut(stath_ID, false, caller, _subaccount, amountValue);
+    let mintTx = await _sendOut(stath_ID, false, caller, _subaccount, amount_value);
     return #ok("Successful");
   };
   //Used when pool on initailDeployment to raise Sufficient backing for the minting of $QUOTE
@@ -275,14 +275,14 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
       case (#Err(err)) { return #err(err) };
     };
 
-    let amountEquivalent = amount * details.btc_price / 10 ** details.price_decimal;
+    let amount_equivalent = amount * details.btc_price / 10 ** details.price_decimal;
     //transaction fails if $QUOTE is paseed minCollateral i.e each amount of $QUOTE is not backed by 4x the price equivalent in BTC
-    if ((details.pool_valuation / 4) < (details.quote_total_supply + amountEquivalent)) {
+    if ((details.pool_valuation / 4) < (details.quote_total_supply + amount_equivalent)) {
       return #err("Insufficient Collateral in Pool");
     };
-    let amountAfterFees = _takeFee(amountEquivalent, 500);
+    let amount_after_fees = _takeFee(amount_equivalent, 500);
     let sendInTx = await _sendIn(ckBTC_ID, true, caller, _subaccount, amount);
-    let mintTx = await _sendOut(quote_ID, false, caller, _subaccount, amountAfterFees);
+    let mintTx = await _sendOut(quote_ID, false, caller, _subaccount, amount_after_fees);
     return #ok("Succesful");
   };
 
@@ -293,17 +293,17 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
     };
     let quote_valuation = (details.quote_total_supply * (10 ** details.price_decimal)) / details.btc_price;
 
-    let amountEquivalent : Nat = (amount * (details.pool_balance - quote_valuation)) / details.stath_total_supply;
+    let amount_equivalent : Nat = (amount * (details.pool_balance - quote_valuation)) / details.stath_total_supply;
 
-    let poolValuationAfter : Nat = ((details.pool_balance - amountEquivalent) * details.btc_price) / 10 ** details.price_decimal;
+    let poolValuationAfter : Nat = ((details.pool_balance - amount_equivalent) * details.btc_price) / 10 ** details.price_decimal;
 
     //if $QUOTE minCollateral is subceeded i.e less than 4x the price equivalent totalSupply are in the pool transaction fails
     if ((details.quote_total_supply * 4) < poolValuationAfter) {
       return #err("Minimum Collateral Subceeded");
     };
-    let amountAfterFees = _takeFee(amountEquivalent, 10 ** 2);
+    let amount_after_fees = _takeFee(amount_equivalent, 10 ** 2);
     let burnTx = await _sendIn(stath_ID, false, caller, _subaccount, amount);
-    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amountAfterFees);
+    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amount_after_fees);
     return #ok("Succesful");
   };
 
@@ -312,10 +312,10 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
       case (#Ok(essentials)) { essentials };
       case (#Err(err)) { return #err(err) };
     };
-    let amountEquivalent = (amount * (10 ** details.price_decimal)) / details.btc_price;
-    let amountAfterFees = _takeFee(amountEquivalent, 500);
+    let amount_equivalent = (amount * (10 ** details.price_decimal)) / details.btc_price;
+    let amount_after_fees = _takeFee(amount_equivalent, 500);
     let burnTx = await _sendIn(quote_ID, false, caller, _subaccount, amount);
-    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amountAfterFees);
+    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amount_after_fees);
     return #ok("Successful");
   };
 
@@ -329,10 +329,10 @@ shared ({ caller }) actor class QuoteMinter(_price_feed_id : Text, _solvency_fac
       return #err("Solvency Threshhold not Subceeded");
     };
     let quote_valuation = (details.quote_total_supply * 10 ** details.price_decimal) / details.btc_price;
-    let amountEquivalent : Nat = amount * (details.pool_balance - quote_valuation) / details.quote_total_supply;
-    let amountAfterFees = _takeFee(amountEquivalent, 500);
+    let amount_equivalent : Nat = amount * (details.pool_balance - quote_valuation) / details.quote_total_supply;
+    let amount_after_fees = _takeFee(amount_equivalent, 500);
     let burnTX = await _sendIn(quote_ID, false, caller, _subaccount, amount);
-    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amountAfterFees);
+    let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amount_after_fees);
     let ivalue = _incentiveValue(threshhold - details.pool_valuation, amount);
     let mintTx = await _sendOut(stath_ID, false, caller, _subaccount, ivalue);
     return #ok("Succesfull");

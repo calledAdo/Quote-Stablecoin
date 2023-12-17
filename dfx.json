@@ -11,12 +11,16 @@
     "ICRC": {
       "main": "src/Source_backend/ICRC.mo",
       "type": "motoko"
+    },
+    "CKBTC": {
+      "main": "src/Source_backend/ICRC.mo",
+      "type": "motoko"
     }
   },
   "defaults": {
     "build": {
       "args": "",
-      "packtool": "mops sources"
+      "packtool": ""
     }
   },
   "output_env_file": ".env",

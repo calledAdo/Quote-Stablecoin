@@ -1,5 +1,7 @@
 import Types "Types";
 
+//Note this is a just sample canister contract for the xrc priecFeed ,the price of BTC is hardcoded at 30K
+//the official xrc will be used for production
 actor Oracle {
 
     let result : Types.GetExchangeRateResult = #Ok({
