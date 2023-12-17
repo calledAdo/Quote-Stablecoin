@@ -79,11 +79,38 @@ dfx deploy Oracle
 ```
 
 **To Deploy an ICRC token**<br>
-you would need to deploy an ICRC token that you would be using as ckBTC and  aslo minting  a certain amount to yourself
+you would need to deploy an ICRC token that you would be using as ckBTC,QUOTE and STATH and  aslo minting  a certain amount to yourself(for ckBTC);
 [see this Guide on How to deploy an ICRC token](https://internetcomputer.org/docs/current/tutorials/developer-journey/level-4/4.2-icrc-tokens)<br>
 __NOTE that You would  need to enable FEATURE_FLAGS = true to enable all icrc2 features__<br>
-Copy the canister ID when done 
+Copy the canister ID when done <br>
 
+Or you can deploy the sample provided in the dfx file ,just paste this in your terminal and run 
+
+```bash
+
+  # get your principal identity 
+     export MyID=$(dfx identity get-principal)
+  
+    # to deploy ckBTC
+    dfx deploy CKBTC --argument "(record { initial_mints = vec {record {account = record {owner = principal \"${MyID}\";};amount =100000000000000000000000000 }}; minting_account = record{ owner = principal \"${MyID}\"}; token_name = \"CKBitcoin\"; token_symbol = \"ckBTC\"; decimals = 18; transfer_fee : 100000000 })"
+
+```
+  
+  To launch STATH and QUOTE we would need the cansiter ID for the QuoteMinter and we havenot deployed that yet ,so we would just create an empty canister and and install code later 
+
+  ```bash
+
+  #create the empty canister for QuoteMinter and get the canister id
+  dfx canister create Source_backend
+   # create a variable and set it to this canister id 
+    export QUOTE_MINTER_ID=paste the canisterid 
+
+    #To deploy QUOTE
+  dfx deploy CKBTC --argument "(record { initial_mints = vec {}; minting_account = record{ owner = principal \"${QUOTE_MINTER_ID}\"}; token_name = \"Quote\"; token_symbol = \"QUOTE\"; decimals = 18; transfer_fee : 100000000 })"
+
+  # To deploy STATH 
+    dfx deploy CKBTC --argument "(record { initial_mints = vec {}; minting_account = record{ owner = principal \"${QUOTE_MINTER_ID}\"}; token_name = \"Stath\"; token_symbol = \"STATH\"; decimals = 18; transfer_fee : 100000000 })"
+  ```
 
 **To deploy and run the QuoteMinter Canister**
 ```bash
@@ -91,31 +118,43 @@ Copy the canister ID when done
 
    export SOLVENCY_FACTOR= 100_000_000_000
 
-   export ck_BTC_PRINCIPAL= "The canister id for the icrc token you just deployed"
+   export ck_BTC_PRINCIPAL= "The canister of the sample ckBTC you deployed you just deployed"
+
+   export QUOTE_ID= "the canister id of QUOTE"
+
+   export STATH_ID="The cansiter id of STATH"
+
+   
   ```
-  to deploy the canister id
+  to deploy the QuoteMinter canister run
 
   ```bash
 
-  dfx deploy Source_Backend --argument '(
-    _price_feed_id = \"${PRICE_FEED_ID}\";
-    _solvency_factor = ${SOLVENCY_FACTOR};
-    _ckBTC_principal_id = ${ck_BTC_PRINCIPAL}
+  dfx deploy Source_backend --argument '(
+     \"${QUOTE_ID}\",
+     \"${STATH_ID}\",
+     \"${PRICE_FEED_ID}\",
+     ${SOLVENCY_FACTOR},
+    _ ${ck_BTC_PRINCIPAL}
   )'
   ```
 
-  After deployment, call the init function to deploy $QUOTE and $STATH tokens 
-  ``` bash
-  dfx canister call Backend_Source init '()'
-
-
+  After Succesfull deployment call the init function to instantiate it<br>
+  ```bash
+   dfx canister call Source_backend init "()"
   ```
 
-  To depsosit ckBTC you would need to call the bootStrapMint to mint $STATH,from the amount you minted just deposit 10000
+  deposit ckBTC to mint STATH as this would ensure that anyminted Quote is overcollateralized at minting time
+
+
+  To depsosit ckBTC you would need to call the bootStrapMint to mint $STATH,from the amount you minted just deposit 100000000
   ```bash
   export AMOUNT = 
-  dfx canister call  Backend_Source bootStrapMint '(null;10000)' 
+  dfx canister call  Backend_Source bootStrapMint '(null;10000000)' 
+```
 
+ now end the bootstrap phase so quote can be minted 
+```bash
   #end the bootstrapPhase so $QUOTE can be minted
 
   dfx canister call Backend_Source setPhase '(false)' 

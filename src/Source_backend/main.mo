@@ -58,46 +58,6 @@ shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _p
   public func init() : async () {
     assert (deployed == false);
 
-    stath := await ICRC.Token({
-      initial_mints = [{
-        account = {
-          owner = caller;
-          subaccount = null;
-        };
-        amount = 0;
-      }];
-      minting_account = {
-        owner = Principal.fromActor(this);
-        subaccount = null;
-      };
-      token_name = "Stath";
-      token_symbol = "$STHATH";
-      decimals = 10 ** 18;
-      transfer_fee = 10 ** 13;
-    });
-
-    stath_ID := Principal.toText(Principal.fromActor(stath));
-
-    quote := await ICRC.Token({
-      initial_mints = [{
-        account = {
-          owner = caller;
-          subaccount = null;
-        };
-        amount = 0;
-      }];
-      minting_account = {
-        owner = Principal.fromActor(this);
-        subaccount = null;
-      };
-      token_name = "Quote Stablecoin";
-      token_symbol = "$QUOTE";
-      decimals = 10 ** 18;
-      transfer_fee = 5 * 10 ** 15;
-    });
-
-    quote_ID := Principal.toText(Principal.fromActor(quote));
-
     deployed := true;
   };
 

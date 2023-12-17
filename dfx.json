@@ -8,11 +8,15 @@
       "main": "src/Source_backend/Oracle.mo",
       "type": "motoko"
     },
-    "ICRC": {
+    "QUOTE": {
       "main": "src/Source_backend/ICRC.mo",
       "type": "motoko"
     },
     "CKBTC": {
+      "main": "src/Source_backend/ICRC.mo",
+      "type": "motoko"
+    },
+    "STATH": {
       "main": "src/Source_backend/ICRC.mo",
       "type": "motoko"
     }
