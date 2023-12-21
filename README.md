@@ -92,7 +92,7 @@ Or you can deploy the sample provided in the dfx file ,just paste this in your t
      export MyID=$(dfx identity get-principal)
   
     # to deploy ckBTC
-    dfx deploy CKBTC --argument "(record { initial_mints = vec {record {account = record {owner = principal \"${MyID}\";};amount =100000000000000000000000000 }}; minting_account = record{ owner = principal \"${MyID}\"}; token_name = \"CKBitcoin\"; token_symbol = \"ckBTC\"; decimals = 18; transfer_fee : 100000000 })"
+    dfx deploy CKBTC --argument "(record { initial_mints = vec {record {account = record {owner = principal \"${MyID}\";};amount =100000000000000000000000000 }}; minting_account = record{ owner = principal \"${MyID}\"}; token_name = \"CKBitcoin\"; token_symbol = \"ckBTC\"; decimals = 18; transfer_fee = 100000000 })"
 
 ```
   
@@ -165,7 +165,11 @@ Or you can deploy the sample provided in the dfx file ,just paste this in your t
 
   ```
 
+currently deployed at 
 
+ [Minter:]( https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=zuwwm-rqaaa-aaaal-adi6a-cai)
+ [QUOTE:] (https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ztxqy-4iaaa-aaaal-adi6q-cai)
+ [STATH:] (https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=z2u3e-kaaaa-aaaal-adi7a-cai)
   
 
   

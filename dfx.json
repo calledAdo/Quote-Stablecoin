@@ -1,6 +1,6 @@
 {
   "canisters": {
-    "Main": {
+    "Minter": {
       "main": "src/main.mo",
       "type": "motoko"
     },

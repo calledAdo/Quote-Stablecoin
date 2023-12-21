@@ -9,7 +9,7 @@ import Nat32 "mo:base/Nat32";
 import Types "Types";
 import ICRC "ICRC";
 
-shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _price_feed_id : Text, _solvency_factor : Nat, _ckBTC_principal_id : Text) = this {
+shared ({ caller }) actor class Minter(_quoteID : Text, _stathID : Text, _price_feed_id : Text, _solvency_factor : Nat, _ckBTC_principal_id : Text) = this {
 
   type PriceFeed = Types.XRC;
   type Subaccount = Types.Subaccount;
@@ -180,7 +180,7 @@ shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _p
     let price = result.price;
     let price_decimal = result.price_decimal;
     let pool_balance = await ckBTC.icrc1_balance_of({
-      owner = Principal.fromText("aaaaa-aa");
+      owner = Principal.fromActor(this);
       subaccount = null;
     });
 
@@ -202,14 +202,14 @@ shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _p
     };
 
     //quote_valuation is the amount of BTC equivalent in price to the totalSupply of Quote
-    let quote_valuation = (details.quote_total_supply * 10 ** details.price_decimal) / details.btc_price;
+    let quote_valuation = (details.quote_total_supply * (10 ** details.price_decimal)) / details.btc_price;
 
     // when the pool_balance is lower than quote_valuation a bootstrap mint occurs instead
     if (details.pool_balance < quote_valuation) {
       return await _bootStrapMint(caller, _subaccount, amount);
     };
-    let amount_to_mint : Nat = amount * details.stath_total_supply / (details.pool_balance - quote_valuation);
-    let amount_value = amount_to_mint * details.btc_price / 10 ** details.price_decimal;
+    let amount_to_mint : Nat = (amount * details.stath_total_supply) / (details.pool_balance - quote_valuation);
+    let amount_value = (amount_to_mint * details.btc_price) / 10 ** details.price_decimal;
 
     //Pool cannot exceed the maximum amount of leverage which is 8x
     if ((details.quote_total_supply * 8) < (details.pool_valuation + amount_value)) {
@@ -289,7 +289,7 @@ shared ({ caller }) actor class QuoteMinter(_quoteID : Text, _stathID : Text, _p
       return #err("Solvency Threshhold not Subceeded");
     };
     let quote_valuation = (details.quote_total_supply * 10 ** details.price_decimal) / details.btc_price;
-    let amount_equivalent : Nat = amount * (details.pool_balance - quote_valuation) / details.quote_total_supply;
+    let amount_equivalent : Nat = (amount * (details.pool_balance - quote_valuation)) / details.quote_total_supply;
     let amount_after_fees = _takeFee(amount_equivalent, 500);
     let burnTX = await _sendIn(quote_ID, false, caller, _subaccount, amount);
     let sendOutTx = await _sendOut(ckBTC_ID, false, caller, _subaccount, amount_after_fees);
