@@ -167,9 +167,9 @@ Or you can deploy the sample provided in the dfx file ,just paste this in your t
 
 currently deployed at 
 
- [Minter:]( https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=zuwwm-rqaaa-aaaal-adi6a-cai)
- [QUOTE:] (https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ztxqy-4iaaa-aaaal-adi6q-cai)
- [STATH:] (https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=z2u3e-kaaaa-aaaal-adi7a-cai)
+ [Minter:](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=zuwwm-rqaaa-aaaal-adi6a-cai)
+ [QUOTE:](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=ztxqy-4iaaa-aaaal-adi6q-cai)
+ [STATH:](https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=z2u3e-kaaaa-aaaal-adi7a-cai)
   
 
   
